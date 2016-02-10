@@ -4,18 +4,13 @@ defaultTasks 'build'
 
 
 class ConfigGroups {
-	static TEST = [ name: "ExtJS", version: "4.2.1", jsonDocPath: "./jsondocs_ExtJS_4.2.1", customNamespace: null ]
-	static EXTJS_4_2_0 = [ name: "ExtJS", version: "4.2.0", jsonDocPath: "./jsondocs_ExtJS_4.2.0", customNamespace: null ]
-	static EXTJS_4_2_1 = [ name: "ExtJS", version: "4.2.1", jsonDocPath: "./jsondocs_ExtJS_4.2.1", customNamespace: null ]
-	static TOUCH_2_2_1 = [ name: "Touch", version: "2.2.1", jsonDocPath: "./jsondocs_Touch_2.2.1", customNamespace: null ]
-	static TOUCH_2_3_1 = [ name: "Touch", version: "2.3.1", jsonDocPath: "./jsondocs_Touch_2.3.1", customNamespace: null ]
-	static DEFTJS_0_9 = [ name: "DeftJS", version: "0.9", jsonDocPath: "./jsondocs_DeftJS_0.9", customNamespace: "Deft" ]
+	static EXTJS_5_1_1 = [ name: "ExtJS", version: "5.1.1", jsonDocPath: "../generated-jsondoc/", customNamespace: null ]
 }
 
 
 // Project-level extra properties
 project.ext {
-	def currentConfigGroup = ConfigGroups.TOUCH_2_3_1
+	def currentConfigGroup = ConfigGroups.EXTJS_5_1_1
 
 	config = new Config(
 		libraryName: currentConfigGroup.name,
@@ -26,7 +21,7 @@ project.ext {
 		interfaceOnly: true,
 		includePrivate: false,
 		forceAllParamsToOptional: true,
-		outputPath: "./target",
+		outputPath: "../d.ts",
 		omitOverrideComments: true,
 		customNamespace: currentConfigGroup.customNamespace
 	)

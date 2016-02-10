@@ -21,14 +21,15 @@ class LibraryProcessor
 			if( fileJson.name.contains( "Ext" ) || typeManager.isCustomNamespace( fileJson.name ) ) {
 				def aliases = typeManager.getAliases( fileJson )
 				println( "Processing ${ fileJson.name }" )
-				moduleProcessor.processModule( fileJson.name, fileJson )
+				def processedCLasses = [:]
+				moduleProcessor.processModule( fileJson.name, fileJson, processedCLasses )
 
 				// Also generate definitions for alternate class names, since crazy ExtJS swaps them out all over the docs...
 				fileJson.alternateClassNames.each { thisAlias ->
 
 					// Some aliases are absurdly the same as the original, but with different package case, so skip these
 					if( thisAlias.toLowerCase() != fileJson.name.toLowerCase() )
-						moduleProcessor.processModule( thisAlias, fileJson )
+						moduleProcessor.processModule( thisAlias, fileJson, processedCLasses )
 				}
 			}
 		}

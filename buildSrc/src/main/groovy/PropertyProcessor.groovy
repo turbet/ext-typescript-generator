@@ -68,7 +68,7 @@ class PropertyProcessor
 						if( thisType.contains( "/" ) || thisType.contains( "|" ) ) thisType = "any"
 
 						definitionWriter.writeToDefinition( "\t\t/** [Property] (${value.type}) ${ definitionWriter.formatCommentText( value.shortDoc ) } */" )
-						definitionWriter.writeToDefinition( "\t\t${ exportString }${ value.name.replaceAll( '-', '' ) }${ optionalFlag }: ${ typeManager.normalizeType( typeManager.convertToInterface( thisType ) ) };" )
+						definitionWriter.writeToDefinition( "\t\t${ exportString }${ value.name.replaceAll( '-', '' ) }${ optionalFlag }: ${ typeManager.normalizeType( typeManager.convertToInterface( thisType ) ) };\n" )
 						processedConfigNames[ value.name ] = true
 					}
 				}

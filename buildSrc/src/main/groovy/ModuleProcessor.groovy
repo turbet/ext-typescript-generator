@@ -12,21 +12,27 @@ class ModuleProcessor
 		classProcessor.init()
 	}
 
-	def processModule( className, fileJson ) {
+	def processModule( className, fileJson, processedClasses ) {
 		config.currentModule = typeManager.getModule( className )
 
-		definitionWriter.writeToDefinition( "declare module ${ typeManager.getModule( className ) } {" )
-		def processedNames
-
-		// Ext class has special handling to turn it into Ext module-level properties and methods.
-		if( className == "Ext" ) {
-			processedNames = classProcessor.writeProperties( fileJson, false, true )
-			classProcessor.writeMethods( fileJson, processedNames, false, true )
+		// processedClasses hashmap is used to remove duplicated class definition in generated d.ts
+		// added by JeT nov 2015 
+		if ( processedClasses[className] != "done" ) {
+			println "* Process class " + className 
+			definitionWriter.writeToDefinition( "declare module ${ typeManager.getModule( className ) } {" )
+			def processedNames
+	
+			// Ext class has special handling to turn it into Ext module-level properties and methods.
+			if( className == "Ext" ) {
+				processedNames = classProcessor.writeProperties( fileJson, false, true )
+				classProcessor.writeMethods( fileJson, processedNames, false, true )
+			}
+			else {
+				classProcessor.processClass( className, fileJson )
+			}
+	
+			definitionWriter.writeToDefinition( "}" )
+			processedClasses[className] = "done"
 		}
-		else {
-			classProcessor.processClass( className, fileJson )
-		}
-
-		definitionWriter.writeToDefinition( "}" )
 	}
 }

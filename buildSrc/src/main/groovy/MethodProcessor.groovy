@@ -1,5 +1,10 @@
+import static groovy.json.JsonOutput.*
+
+
+
 class MethodProcessor
 {
+
 	TypeManager typeManager
 	Config config
 	DefinitionWriter definitionWriter
@@ -133,7 +138,10 @@ class MethodProcessor
 	def appendMethodParamOutput( methodOutput, paramsDoc, methodParameters ) {
 		methodParameters.paramNames.eachWithIndex { thisParam, i ->
 			def thisParamType = typeManager.convertToInterface( methodParameters.paramTypes[ i ] )
-			def thisParamName = thisParam.name
+			
+
+			// Modified by JeT (add ?: ) nov 2015
+			def thisParamName = thisParam.name == null ? "dummy" : thisParam.name
 
 			paramsDoc += "\t\t* @param ${ thisParamName } ${ methodParameters.rawParamTypes[ thisParamName ] } ${ definitionWriter.formatCommentText( thisParam.doc ) }"
 			if( thisParam.doc && thisParam.doc.contains( "Optional " ) ) thisParam.optional = true
@@ -196,10 +204,10 @@ class MethodProcessor
 
 	def writeMethodDefinition( methodOutput, exportString, methodName, returnType ) {
 		if( methodName != "constructor" ) {
-			definitionWriter.writeToDefinition( "\t\t${exportString}${ methodOutput }): ${ typeManager.normalizeType( returnType ) };" )
+			definitionWriter.writeToDefinition( "\t\t${exportString}${ methodOutput }): ${ typeManager.normalizeType( returnType ) };\n" )
 		}
 		else {
-			definitionWriter.writeToDefinition( "\t\t${ methodOutput });" )
+			definitionWriter.writeToDefinition( "\t\t${ methodOutput });\n" )
 		}
 	}
 
@@ -249,7 +257,7 @@ class MethodProcessor
 
 	def writeMethodAsProperty( thisMethod ) {
 		definitionWriter.writeToDefinition( "\t\t/** [Method] ${ definitionWriter.formatCommentText( thisMethod.shortDoc ) } */" )
-		definitionWriter.writeToDefinition( "\t\t${ thisMethod.name.replaceAll( '-', '' ) }${ optionalFlag }: any;" )
+		definitionWriter.writeToDefinition( "\t\t${ thisMethod.name.replaceAll( '-', '' ) }${ optionalFlag }: any;\n" )
 	}
 
 	def shouldCreateOverrideMethod( requiresOverrides, tokenizedReturnTypes, returnType ) {

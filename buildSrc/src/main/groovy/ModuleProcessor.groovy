@@ -20,6 +20,8 @@ class ModuleProcessor
 		if ( processedClasses[className] != "done" ) {
 			println "* Process class " + className 
 			definitionWriter.writeToDefinition( "declare module ${ typeManager.getModule( className ) } {" )
+			definitionWriter.writeToConfig( "declare module Typ${ typeManager.getModule( className ) } {" )
+			definitionWriter.writeToFactory( "module Typ${ typeManager.getModule( className ) } {" )
 			def processedNames
 	
 			// Ext class has special handling to turn it into Ext module-level properties and methods.
@@ -31,6 +33,8 @@ class ModuleProcessor
 				classProcessor.processClass( className, fileJson )
 			}
 	
+			definitionWriter.writeToFactory( "}" )
+			definitionWriter.writeToConfig( "}" )
 			definitionWriter.writeToDefinition( "}" )
 			processedClasses[className] = "done"
 		}

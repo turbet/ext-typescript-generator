@@ -39,7 +39,7 @@ class MethodProcessor
 		}
 
 		classMethods.each { thisMethod ->
-
+			
 			if( shouldIncludeMethod( fileJson, thisMethod, includeStaticMethodsOnly ) || specialCases.shouldForceInclude( fileJson.name, thisMethod.name ) ) {
 
 				if( specialCases.shouldRewriteMethod( fileJson.name, thisMethod.name ) )
@@ -47,6 +47,7 @@ class MethodProcessor
 
 				processedNames[ thisMethod.name ] = true
 				normalizeMethodDoc( thisMethod )
+				if ( thisMethod.name == 'setStyle' ) println 'process method ' + thisMethod.name + ' return type=' + thisMethod.return
 				handleReturnTypeSpecialCases( thisMethod, fileJson )
 
 				// Convert methods to property fields for special cases where an item has incompatible ExtJS API overrides in subclasses
@@ -188,7 +189,7 @@ class MethodProcessor
 				if( returnComment )
 					definitionWriter.writeToDefinition( returnComment )
 				definitionWriter.writeToDefinition( "\t\t*/" )
-			}
+				}
 			else {
 				if( returnComment ) {
 					definitionWriter.writeToDefinition( comment )
@@ -245,8 +246,9 @@ class MethodProcessor
 
 	def handleReturnTypeSpecialCases( thisMethod, fileJson ) {
 		// Convert return types for special cases where original return type isn't valid
-		if( specialCases.getReturnTypeOverride( thisMethod.return?.type ) ) {
-			thisMethod.return.type = specialCases.getReturnTypeOverride( thisMethod.return.type )
+		if( !thisMethod.return) {
+			thisMethod.return = [:]
+			thisMethod.return.type = specialCases.getReturnTypeOverride( fileJson.name, thisMethod.name )
 		}
 
 		// Convert return types for special cases where an overridden subclass method returns an invalid type

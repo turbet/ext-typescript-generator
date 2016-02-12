@@ -30,7 +30,10 @@ class PropertyProcessor
 		if( !useExport && !isInterface && fileJson.singleton ) exportString = "static "
 
 		classConfig.each { value ->
-			if( value?.owner == fileJson.name && value.name != "" ) {
+			
+			if ( value.name == 'animate' ) println "treat property '" + value.name + "' from " + fileJson.name + " -> " + specialCases.shouldRemoveProperty( fileJson.name, value.name )
+
+						if( value?.owner == fileJson.name && value.name != "" ) {
 				if( !config.includePrivate && value.private != true ) {
 
 					// Don't output special cases where an item should be omitted due to incompatible ExtJS API overrides in subclasses
@@ -45,6 +48,9 @@ class PropertyProcessor
 
 						definitionWriter.writeToDefinition( "\t\t/** [Config Option] (${value.type}) ${ definitionWriter.formatCommentText( value.shortDoc ) } */" )
 						definitionWriter.writeToDefinition( "\t\t${ exportString }${ value.name.replaceAll( '-', '' ) }${ optionalFlag }: ${ typeManager.normalizeType( typeManager.convertToInterface( thisType ) ) };" )
+
+						definitionWriter.writeToConfig( "\t\t/** [Config Option] (${value.type}) ${ definitionWriter.formatCommentText( value.shortDoc ) } */" )
+						definitionWriter.writeToConfig( "\t\t${ exportString }${ value.name.replaceAll( '-', '' ) }${ optionalFlag }: ${ typeManager.normalizeType( typeManager.convertToInterface( thisType ) ) };" )
 					}
 
 					processedConfigNames[ value.name ] = true
@@ -57,9 +63,16 @@ class PropertyProcessor
 		}
 
 		classProperties.each { value ->
+			
 			if( ( !isInterface && fileJson.singleton ) || ( value?.owner == fileJson.name && value.name != "" ) ) {
 				if( !config.includePrivate && value.private != true ) {
+					
+					
 					if( !processedConfigNames[ value.name ] && !specialCases.shouldRemoveProperty( fileJson.name, value.name ) ) {
+						if ( specialCases.shouldRemoveProperty( fileJson.name, value.name ) ) {
+							println "skip property '" + value.name + "' from " + fileJson.name
+							
+						}
 						thisType = value.type
 
 						if( specialCases.getPropertyTypeOverride( fileJson.name, value.name ) )
@@ -69,6 +82,9 @@ class PropertyProcessor
 
 						definitionWriter.writeToDefinition( "\t\t/** [Property] (${value.type}) ${ definitionWriter.formatCommentText( value.shortDoc ) } */" )
 						definitionWriter.writeToDefinition( "\t\t${ exportString }${ value.name.replaceAll( '-', '' ) }${ optionalFlag }: ${ typeManager.normalizeType( typeManager.convertToInterface( thisType ) ) };\n" )
+
+						definitionWriter.writeToConfig( "\t\t/** [Property] (${value.type}) ${ definitionWriter.formatCommentText( value.shortDoc ) } */" )
+						definitionWriter.writeToConfig( "\t\t${ exportString }${ value.name.replaceAll( '-', '' ) }${ optionalFlag }: ${ typeManager.normalizeType( typeManager.convertToInterface( thisType ) ) };\n" )
 						processedConfigNames[ value.name ] = true
 					}
 				}

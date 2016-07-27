@@ -35,36 +35,46 @@ class ClassProcessor
 		aliasManager.addAliases( className, fileJson )
 
 		definitionWriter.writeToDefinition( "\texport interface I${ typeManager.getClassName( className ) } ${ typeManager.getExtends( fileJson, true ) } {" )
-		definitionWriter.writeToConfig( "\texport interface I${ typeManager.getClassName( className ) }Config ${ typeManager.getExtendsConfig( fileJson, true ) } {" )
+		definitionWriter.writeToConfig( "\t interface I${ typeManager.getClassName( className ) }Config ${ typeManager.getExtendsConfig( fileJson, true ) } {" )
 		if( !fileJson.singleton ) {
 			processedNames = writeProperties( fileJson, true, false )
 			hasStaticMethods = writeMethods( fileJson, processedNames, true, false )
 		}
-		definitionWriter.writeToConfig( "\t}" )
 		definitionWriter.writeToDefinition( "\t}" )
 
-		definitionWriter.writeToFactory( "\texport class ${ typeManager.getClassName( className ) } {" )
-		definitionWriter.writeToFactory( "\t\tstatic create(config: Typ${ typeManager.getModule( className ) }.${ typeManager.getClassName( className ) }Config, extraArgs?: any) : ${ typeManager.getModule( className ) }.I${ typeManager.getClassName( className ) } {" )
-		definitionWriter.writeToFactory( "\t\t\treturn TypExt.Object.create(\"" + typeManager.getModule( className ) + "." + typeManager.getClassName( className ) + "\", config, extraArgs );" )
-		definitionWriter.writeToFactory( "\t\t}" )
-		definitionWriter.writeToFactory( "\t}" )
+		if( !config.interfaceOnly || fileJson.singleton || hasStaticMethods ) {
+			if( !config.interfaceOnly ) {
+				definitionWriter.writeToDefinition( "\texport class ${ typeManager.getClassName( className ) } ${ typeManager.getExtends( fileJson, false ) } implements ${typeManager.getImplementedInterfaces( fileJson ) } {" )
+				processedNames = writeProperties( fileJson, false, false )
+			}
+			else {
+				definitionWriter.writeToDefinition( "\texport class ${ typeManager.getClassName( className ) } {" )
+				processedNames = [:]
+						if( fileJson.singleton ) {
+							processedNames = writeProperties( fileJson, false, false )
+						}
+			}
+			
+			writeMethods( fileJson, processedNames, false, false, hasStaticMethods )
+			definitionWriter.writeToDefinition( "\t}" )
+		}
 
-//		if( !config.interfaceOnly || fileJson.singleton || hasStaticMethods ) {
-//			if( !config.interfaceOnly ) {
-//				definitionWriter.writeToDefinition( "\texport class ${ typeManager.getClassName( className ) } ${ typeManager.getExtends( fileJson, false ) } implements ${typeManager.getImplementedInterfaces( fileJson ) } {" )
-//				processedNames = writeProperties( fileJson, false, false )
-//			}
-//			else {
-//				definitionWriter.writeToDefinition( "\texport class ${ typeManager.getClassName( className ) } {" )
-//				processedNames = [:]
-//				if( fileJson.singleton ) {
-//					processedNames = writeProperties( fileJson, false, false )
-//				}
-//			}
-//
-//			writeMethods( fileJson, processedNames, false, false, hasStaticMethods )
-//			definitionWriter.writeToDefinition( "\t}" )
-//		}
+		definitionWriter.writeToConfig( "\t}" )
+
+		if ( className != 'Ext.Object') {
+			definitionWriter.writeToFactory( "\texport class ${ typeManager.getClassName( className ) } {" )
+			definitionWriter.writeToFactory( "\t\tstatic create(config: Typ${ typeManager.getModule( className ) }.I${ typeManager.getClassName( className ) }Config, extraArgs?: any) : ${ typeManager.getModule( className ) }.I${ typeManager.getClassName( className ) } {" )
+			definitionWriter.writeToFactory( "\t\t\treturn TypExt.Object.create(\"" + typeManager.getModule( className ) + "." + typeManager.getClassName( className ) + "\", config, extraArgs );" )
+			definitionWriter.writeToFactory( "\t\t}" )
+			definitionWriter.writeToFactory( "\t}" )
+
+			definitionWriter.writeToFactoryDefinition( "\tclass ${ typeManager.getClassName( className ) } {" )
+			definitionWriter.writeToFactoryDefinition( "\t\tstatic create(config: Typ${ typeManager.getModule( className ) }.I${ typeManager.getClassName( className ) }Config, extraArgs?: any) : ${ typeManager.getModule( className ) }.I${ typeManager.getClassName( className ) };" )
+			definitionWriter.writeToFactoryDefinition( "\t}" )
+			definitionWriter.writeToFactoryDefinition( "" )
+		}
+		definitionWriter.writeToConfig( "" )
+		definitionWriter.writeToDefinition( "" )
 	}
 
 	def writeProperties( fileJson, isInterface, useExport ) {

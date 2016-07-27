@@ -20,6 +20,7 @@ class ModuleProcessor
 		if ( processedClasses[className] != "done" ) {
 			println "* Process class " + className 
 			definitionWriter.writeToDefinition( "declare module ${ typeManager.getModule( className ) } {" )
+			definitionWriter.writeToFactoryDefinition( "declare module Typ${ typeManager.getModule( className ) } {" )
 			definitionWriter.writeToConfig( "declare module Typ${ typeManager.getModule( className ) } {" )
 			definitionWriter.writeToFactory( "module Typ${ typeManager.getModule( className ) } {" )
 			def processedNames
@@ -34,8 +35,13 @@ class ModuleProcessor
 			}
 	
 			definitionWriter.writeToFactory( "}" )
+			definitionWriter.writeToFactory( "" )
+			definitionWriter.writeToFactoryDefinition( "}" )
+			definitionWriter.writeToFactoryDefinition( "" )
 			definitionWriter.writeToConfig( "}" )
+			definitionWriter.writeToConfig( "" )
 			definitionWriter.writeToDefinition( "}" )
+			definitionWriter.writeToDefinition( "" )
 			processedClasses[className] = "done"
 		}
 	}
